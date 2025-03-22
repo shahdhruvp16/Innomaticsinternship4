@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Add Doctor API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h2 {
+            text-align: center;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        #image-preview {
+            display: block;
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .response {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Add Doctor</h2>
+    <form id="doctorForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="text" id="speciality" placeholder="Speciality" required>
+        <input type="text" id="degree" placeholder="Degree" required>
+        <input type="number" id="experience" placeholder="Experience (years)" required>
+        <textarea id="about" placeholder="About Doctor" required></textarea>
+        <input type="number" id="fees" placeholder="Fees ($)" required>
+        <input type="text" id="address" placeholder="Address" required>  <!-- Now in normal format -->
+        <input type="file" id="image" accept="image/*" required>
+        <img id="image-preview" style="display: none;">
+        <button type="submit">Submit</button>
+    </form>
+    <div id="responseMessage" class="response"></div>
+</div>
+
+<script>
+    document.getElementById("image").addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("image-preview").src = e.target.result;
+                document.getElementById("image-preview").style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById("doctorForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+        
+        const formData = new FormData();
+        formData.append("name", document.getElementById("name").value);
+        formData.append("email", document.getElementById("email").value);
+        formData.append("password", document.getElementById("password").value);
+        formData.append("speciality", document.getElementById("speciality").value);
+        formData.append("degree", document.getElementById("degree").value);
+        formData.append("experience", document.getElementById("experience").value);
+        formData.append("about", document.getElementById("about").value);
+        formData.append("fees", document.getElementById("fees").value);
+        formData.append("address", document.getElementById("address").value);  // Now as plain text
+        formData.append("image", document.getElementById("image").files[0]);
+
+        try {
+            const response = await fetch("http://localhost:4000/api/admin/add-doctor", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById("responseMessage").textContent = result.message;
+            document.getElementById("responseMessage").style.color = result.success ? "green" : "red";
+        } catch (error) {
+            console.error("Error:", error);
+            document.getElementById("responseMessage").textContent = "Something went wrong!";
+            document.getElementById("responseMessage").style.color = "red";
+        }
+    });
+</script>
+
+</body>
+</html>

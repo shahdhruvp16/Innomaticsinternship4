@@ -95,4 +95,15 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-export { addDoctor, loginAdmin };
+// API to get all doctors for admin panel
+const allDoctors = async (req, res) => {
+  try {
+    const doctors = await doctorModel.find({}).select('-password')
+    res.json({ success: true, doctors });
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+}
+
+export { addDoctor, loginAdmin, allDoctors };
